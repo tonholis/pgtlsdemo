@@ -13,7 +13,16 @@ namespace pgdemo
             string username = Environment.GetEnvironmentVariable("DB_USER") ?? "myapp";
             string password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "secret";
 
-            var db = new MyDbContext($"Host={host};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true");
+            string[] connectionString = new []{
+                $"Host={host}",
+                $"Database={database}",
+                $"Username={username}",
+                $"Password={password}",
+                "SSL Mode=Require",
+                "Trust Server Certificate=true",
+            };
+
+            var db = new MyDbContext(String.Join(";", connectionString));
             db.Database.Migrate();
 
             db.Products.Add(new Product { Name="Banana" });
