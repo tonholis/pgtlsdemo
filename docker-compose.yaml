@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  db:
+    image: 'bitnami/postgresql:11.13.0'
+    environment:
+      POSTGRESQL_USERNAME: myapp
+      POSTGRESQL_PASSWORD: secret
+      POSTGRESQL_DATABASE: myapp
+      POSTGRESQL_ENABLE_TLS: 'yes'
+      POSTGRESQL_TLS_CA_FILE: /certs/ca.crt
+      POSTGRESQL_TLS_CERT_FILE: /certs/server.crt
+      POSTGRESQL_TLS_KEY_FILE: /certs/server.key
+    volumes:
+      - ./certs:/certs
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 10s
+
+  # Container running a .NET app
+  myapp:
+    build: .
+    volumes:
+      - ./certs:/certs
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGSSLROOTCERT: /certs/ca.crt
+      PGSSLCERT: /certs/client.crt
+      PGSSLKEY: /certs/client.key
+      PGSSLMODE: verify-full
+      DB_HOST: db
+      DB_NAME: myapp
+      DB_USER: myapp
+      DB_PASSWORD: secret
+
+  ## Container to test a connection using the client certificate
+  ##   docker-compose exec client bash
+  ##   psql -h db -U myapp
+  # client:
+  #   image: 'bitnami/postgresql:11.13.0'    
+  #   command: sleep infinity
+  #   volumes:
+  #     - ./certs:/certs
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     PGSSLROOTCERT: /certs/ca.crt
+  #     PGSSLCERT: /certs/client.crt
+  #     PGSSLKEY: /certs/client.key
+  #     PGSSLMODE: verify-full
