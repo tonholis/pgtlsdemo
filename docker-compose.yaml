@@ -4,13 +4,13 @@ services:
   db:
     image: 'bitnami/postgresql:11.13.0'
     environment:
-      POSTGRESQL_USERNAME: myapp
-      POSTGRESQL_PASSWORD: secret
-      POSTGRESQL_DATABASE: myapp
-      POSTGRESQL_ENABLE_TLS: 'yes'
-      POSTGRESQL_TLS_CA_FILE: /certs/ca.crt
-      POSTGRESQL_TLS_CERT_FILE: /certs/server.crt
-      POSTGRESQL_TLS_KEY_FILE: /certs/server.key
+      - POSTGRESQL_USERNAME=myapp
+      - POSTGRESQL_PASSWORD=secret
+      - POSTGRESQL_DATABASE=myapp
+      - POSTGRESQL_ENABLE_TLS=yes
+      - POSTGRESQL_TLS_CA_FILE=/certs/ca.crt
+      - POSTGRESQL_TLS_CERT_FILE=/certs/server.crt
+      - POSTGRESQL_TLS_KEY_FILE=/certs/server.key
     ports:
       - "5432:5432"
     volumes:
@@ -29,8 +29,8 @@ services:
         condition: service_healthy
     environment:
       PGSSLROOTCERT: /certs/ca.crt
-      PGSSLCERT: /certs/client.crt
-      PGSSLKEY: /certs/client.key
+      PGSSLCERT: /certs/client.pfx
+      PGSSLKEY: 'pfxpassword'
       PGSSLMODE: verify-full
       DB_HOST: db
       DB_NAME: myapp

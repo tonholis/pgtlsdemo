@@ -20,3 +20,5 @@ openssl req -new -x509 -days 365 -nodes -out ca.crt -keyout ca.key -subj "/CN=ro
 echo "Generating leaf certificates"
 gen_cert db server
 gen_cert myapp client
+
+openssl pkcs12 -export -inkey client.key -in client.crt -out client.pfx
